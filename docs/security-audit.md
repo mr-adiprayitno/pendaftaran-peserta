@@ -3,22 +3,26 @@
 **Tanggal:** 1 Oktober 2026 · **Build diaudit:** `10febe6` · **Metode:** audit kode statis + uji exploit dinamis (DB race test, cookie forgery, akses publik port) + verifikasi infra (nginx, CF, binding port)
 **Scope:** seluruh kode app (`src/`, `prisma/`, `scripts/`), konfigurasi Next/nginx, eksposur jaringan, dependencies. *Tidak* within scope: Cloudflare dashboard di luar zone settings yang terbaca, akun-akun DNS lain.
 
+**Konteks pemakaian (per owner):** ini **demo prototype untuk kebutuhan ujian LSP informatika** — bukan sistem produksi pembayaran nyata. Security di level infra (Cloudflare orange, TLS, nginx, port binding DB loopback-only) dianggap aman dan di luar lingkup tindak lanjut app. Seluruh penilaian & prioritas di dokumen ini menggunakan lensa tersebut; rekomendasi "sebelum produksi real" hanya berlaku bila suatu saat app ini diminta jadi produksi sungguhan.
+
 ---
 
-## Ringkasan Risiko
+## Ringkasan Risiko — lensa demo (ujian LSP informatika)
 
-| Skor | Jumlah | Arti |
+Konteks keputusan owner: app ini demo prototype untuk ujian LSP informatika; security infra (TLS CF+nginx, DB loopback, proteksi port host) dianggap aman. Matriks tetap memakai skala P0-P3 teknis, tetapi *tingkat tindak lanjut* mengikuti bagian "Prioritas Aksi" di bawah.
+
+| Skor | Jumlah | Arti (produksi) |
 |---|---|---|
 | P0 Kritis | **0** | Tidak ditemukan backdoor / account takeover langsung |
-| P1 Tinggi | **3** | Harus dibereskan sebelum dipakai klien sungguhan |
-| P2 Sedang | **5** | Bereskan sebelum produksi penuh |
+| P1 Tinggi | **3** | Wajib fix bila menjadi produksi nyata |
+| P2 Sedang | **5** | Bereskan saat diproduksi penuh |
 | P3 Rendah / catatan | **4** | Hygiene, dokumentasi, hardening tambahan |
 
-**Verdict umum:** untuk *prototype demo* statusnya **layak tayang** — tidak ada lubang yang memungkinkan orang asing mengambil alih admin atau melihat data peserta lain. Untuk **pemakaian produksi nyata** (pembayaran asli, data PII publik) wajib bereskan P1 dan sebagian P2 dulu; khususnya BR-4 (Undangan auto-lunas), rate-limit, dan secret fallback.
+**Verdict umum:** untuk *prototype demo (konteks ujian LSP informatika)* statusnya **LAYAK TAYANG** — tidak ada lubang yang memungkinkan orang asing mengambil alih admin atau melihat data peserta lain, dan layer infra (TLS via Cloudflare+nginx, DB loopback-only) sudah menutup permukaan serangan jaringan. Temuan P1/P2 di bawah **bukan blocker untuk demo** — tercatat sebagai backlog bila suatu saat diangkat jadi produksi nyata.
 
 ---
 
-## P1 — Tinggi (wajib fix produksi)
+## P1 — Tinggi *(hanya relevan jika jadi produksi nyata; untuk demo = catatan backlog)*
 
 ### P1-1 · BR-4: Siapapun bisa memilih "Undangan / Gratis" → langsung lunas & terverifikasi
 - **Lokasi:** `src/actions.ts:84-85` (`isInvited = input.paymentMethod === "INVITED"` → `status: VERIFIED, paymentStatus: PAID`)
@@ -123,12 +127,12 @@
 
 ---
 
-## Prioritas Aksi (urutan eksekusi)
+## Prioritas Aksi (konteks: demo LSP informatika — infra-level security sudah dianggap aman)
 
-1. **Sekarang (prototype):** P2-1 bind 127.0.0.1 + P1-3 gagal-closed secret. Keduanya 5 menit, tanpa perubahan UX.
-2. **Sebelum demo klien:** P3-1 ganti password admin + hapus dari README/UI; P2-2 flag secure cookie.
-3. **Sebelum produksi real:** P1-1 (undangan via admin), P1-2 (rate-limit), P2-3 (cap panjang), P2-5 (tx kuota), P2-4 (patch prisma saat fix rilis), P3-2/P3-4 (hardening).
+1. **Demo sekarang: tidak ada fix wajib.** Semua P1/P2 dinyatakan *backlog produksi*, bukan blocker demo.
+2. **Catatan opsional sebelum demo ke klien/asesor:** P3-1 (ganti password admin + hapus kredensial dari README/UI) dan P2-1 (bind 127.0.0.1) — keduanya 5-10 menit, berjalan saat diminta.
+3. **Hanya jika suatu saat dibangun jadi produksi nyata:** baru eksekusi urutan P1-1 → P1-2 → P1-3 → P2-2 → P2-3 → P2-5 → P2-4 → P3-2/P3-4 (detail di atas).
 
 ---
 
-*Audit oleh MUXA — statis dari kode + uji dinamis live; bukan audit pihak ketiga tersertifikasi (ISO 27001 / pen-test vendor), disarankan pentest independen sebelum produksi mengelola pembayaran nyata.*
+*Audit oleh MUXA — statis dari kode + uji dinamis live; bukan audit pihak ketiga tersertifikasi (ISO 27001 / pen-test vendor). Konteks demo LSP: risiko diterima pada level ini; untuk produksi nyata disarankan pentest independen sebelum mengelola pembayaran sungguhan.*
