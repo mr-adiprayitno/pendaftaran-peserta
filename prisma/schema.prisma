@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  venue       String
+  eventDate   DateTime
+  quota       Int
+  price       Int @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  registrations Registration[]
+}
+
+model Registration {
+  id                 String           @id @default(cuid())
+  event              Event            @relation(fields: [eventId], references: [id])
+  eventId            String
+  regCode            String           @unique
+  fullName           String
+  email              String
+  phone              String
+  organization       String?
+  address            String?
+  registrationStatus RegistrationStatus @default(PENDING_VERIFICATION)
+  paymentStatus      PaymentStatus      @default(UNPAID)
+  paymentMethod      String?
+  paymentReference   String
+  adminNote          String?
+  verifiedAt         DateTime?
+  paidAt             DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  usedCode RegistrationCode?
+
+  @@index([eventId])
+  @@index([email])
+  @@index([regCode])
+}
+
+model RegistrationCode {
+  id                   String   @id @default(cuid())
+  code                 String   @unique
+  isUsed               Boolean  @default(false)
+  usedByRegistrationId String?  @unique
+  usedByRegistration   Registration? @relation(fields: [usedByRegistrationId], references: [id])
+  usedAt               DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String
+  detail    String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+}
+
+enum RegistrationStatus {
+  PENDING_VERIFICATION
+  VERIFIED
+  APPROVED
+  REJECTED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+}

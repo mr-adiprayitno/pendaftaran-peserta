@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pendaftaran Peserta — Prototype
 
-## Getting Started
+Aplikasi web pendaftaran peserta: dari input data diri, kode registrasi, hingga pembayaran. Build demo (prototype) — pembayaran belum terhubung gateway sungguhan.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 16 (App Router, Server Actions)
+- Prisma 7 + PostgreSQL 16 (Docker)
+- Tailwind CSS 4
+- Tanpa NextAuth — session HMAC sederhana utk demo
+
+## Jalankan Lokal
+
+1. Database:
+   ```bash
+   docker network create pendaftaran-net 2>/dev/null
+   docker run -d --name pendaftaran-pg --network pendaftaran-net \
+     -e POSTGRES_USER=pendaftaran -e POSTGRES_PASSWORD=pendaftaran_demo_2026 \
+     -e POSTGRES_DB=pendaftaran -p 127.0.0.1:5440:5432 postgres:16-alpine
+   ```
+
+2. Env (`.env`):
+   ```
+   DATABASE_URL=postgresql://pendaftaran:pendaftaran_demo_2026@localhost:5440/pendaftaran
+   ```
+
+3. Migrasi + seed:
+   ```bash
+   DATABASE_URL=$(grep DATABASE_URL .env | cut -d= -f2-) npx prisma migrate dev
+   DATABASE_URL=$(grep DATABASE_URL .env | cut -d= -f2-) npx tsx prisma/seed.ts
+   ```
+
+4. Build & run:
+   ```bash
+   npm run build && npm start
+   # atau: npm run dev
+   ```
+
+## Login Admin (demo)
+
+- URL: `/admin`
+- Username: `admin`
+- Password: `admin123`
+
+## Data Demo
+
+- Event: Workshop & Sertifikasi AI untuk Profesional (15 Nov 2026, kuota 100)
+- Kode registrasi: `REG-2026-0001` s/d `REG-2026-0015`
+
+## Struktur
+
+```
+prisma/            schema + migrasi + seed
+src/actions.ts     server actions (daftar, cek status, login)
+src/app/(public)/  halaman publik (landing, /daftar, /cek-status)
+src/app/admin/     login + dashboard admin
+src/lib/           db client, helpers, validasi shared
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Roadmap (post-prototype)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Gateway pembayaran (Midtrans/Xendit) + webhook idempotent
+- Email/kirim kode via WhatsApp
+- Export CSVExcel pendaftar
+- QrCode check-in
+- Multi-event management UI
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Status Keamanan (prototype)
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Session admin: cookie HMAC, httpOnly — **ganti `ADMIN_SESSION_SECRET` env untuk produksi.**
+- Password di-hash scrypt w/ random salt.
+- Semua DB credential di-env, tak di-commit (`.env` di gitignore).
+- **Belum ada rate-limit & CSRF klaim khusus — prototype saja.**
