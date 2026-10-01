@@ -350,4 +350,4 @@ UAT dinyatakan **LULUS** bila:
 
 ---
 
-*Dibuat otomatis dari audit kode build 0b8d470 — semua nilai hasil-hasil yang dinyatakan "dihargapkan" diambil dari perilaku implementasi yang sudah diverifikasi oleh pengujian build sebelumnya (smoke test HTTP + uji keamanan session + E2E DB).*
+*Dibuat otomatis dari audit kode build 0b8d470 — semua nilai hasil-hasil yang dinyatakan "diharapkan" diambil dari perilaku implementasi yang sudah diverifikasi oleh pengujian build sebelumnya (smoke test HTTP + uji keamanan session + E2E DB).*

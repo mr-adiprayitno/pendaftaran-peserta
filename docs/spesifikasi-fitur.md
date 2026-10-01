@@ -165,8 +165,8 @@ Bukan REST — Next.js Server Actions di layer server (type-safe, tanpa endpoint
 
 ## 9. Checklist Acceptance (Sudah Diuji)
 
-- ✇ Build production hijau (`next build`).
-- ✇ Route smoke: `/`, `/daftar`, `/cek-status`, `/admin`, `/admin/pendaftaran` = 200 / 307 redirect benar.
-- ✇ E2E DB: create → kode terpakai → duplikat terdeteksi → approve idempotent → pass (`scripts/e2e-db.ts`).
-- ✇ Live URL `https://demo-web.harmonyrise.id` semua route 200 & dashboard dilindungi.
-- ✇ Auth uji: password benar/salah, token valid/palsu.
+- ✅ Build production hijau (`next build`).
+- ✅ Route smoke: `/`, `/daftar`, `/cek-status`, `/admin`, `/admin/pendaftaran` = 200 / 307 redirect benar.
+- ✅ E2E DB: create → kode terpakai → duplikat terdeteksi → approve idempotent → pass (`scripts/e2e-db.ts`).
+- ✅ Live URL `https://demo-web.harmonyrise.id` semua route 200 & dashboard dilindungi.
+- ✅ Auth uji: password benar/salah, token valid/palsu.

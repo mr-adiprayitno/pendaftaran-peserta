@@ -62,7 +62,7 @@ Konteks keputusan owner: app ini demo prototype untuk ujian LSP informatika; sec
 - **Dampak:** bila ada akses via HTTP polos (lihat P2-1) atau MITM di jaringan klien, cookie admin bisa terpanen.
 - **Fix:** `secure: process.env.NODE_ENV === "production"` di opsi cookie (setelah P2-1 beres).
 
-### P2-3 · Tidak ada cap panjang & sanitasi ketat pada bebeberapa field input
+### P2-3 · Tidak ada cap panjang & sanitasi ketat pada beberapa field input
 - **Lokasi:** `src/lib/shared.ts` (hanya min-length; tanpa `maxLength`), kolom DB `text` tanpa `@db.VarChar(n)`
 - **Exploit:** submit nama 500k karakter → memenuhi baris DB & UI dashboard; string aneh di organization/address.
 - **Dampak:** bloat DB, UI rusak/lebar, kerumitan tampilan. (XSS TIDAK mungkin — React escaping, sudah diuji di dokumen UAT.)

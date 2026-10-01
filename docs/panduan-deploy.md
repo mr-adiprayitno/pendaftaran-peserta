@@ -71,7 +71,7 @@ ZONE=c30d992cd10d4ea51d31450a1bb658c4
 curl -s "https://api.cloudflare.com/client/v4/zones/$ZONE/dns_records?name=demo-web.harmonyrise.id" -H "Authorization: Bearer $CF_TOKEN"
 ```
 
-## Verfikasi Sehat (jalankan setelah deploy ulang)
+## Verifikasi Sehat (jalankan setelah deploy ulang)
 
 ```bash
 for p in / /daftar /cek-status /admin /robots.txt; do
