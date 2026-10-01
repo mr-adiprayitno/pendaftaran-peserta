@@ -71,3 +71,7 @@ src/lib/           db client, helpers, validasi shared
 - Password di-hash scrypt w/ random salt.
 - Semua DB credential di-env, tak di-commit (`.env` di gitignore).
 - **Belum ada rate-limit & CSRF klaim khusus — prototype saja.**
+Dokumentasi lengkap:
+- docs/use-case-diagram.md — aktor, use case, relasi, alur
+- docs/spesifikasi-fitur.md — fitur built v1.0, aturan bisnis, status, API
+- docs/panduan-deploy.md  — topologi, restart, systemd sample, reset data
