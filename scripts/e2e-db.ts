@@ -11,11 +11,11 @@ async function main() {
   const code = await prisma.registrationCode.findUnique({
     where: { code: "REG-2026-0002" },
   });
-  console.log("kode available:", code && !code.isUsed);
+  if (!code) throw new Error("kode REG-2026-0002 tidak ada");
 
   // 2. event aktif
   const event = await prisma.event.findFirst({ where: { isActive: true } });
-  console.log("event:", event.title);
+  if (!event) throw new Error("tidak ada event aktif");
 
   // 3. create registration (logika sama dengan action)
   const reg = await prisma.registration.create({

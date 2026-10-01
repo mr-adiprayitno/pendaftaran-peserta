@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
-import { formatDateID, formatTimeID, formatRupiah } from "@/lib/helpers";
+import { formatDateID, formatTimeID, formatRupiah, verifyAdminSession, ADMIN_COOKIE } from "@/lib/helpers";
 import { adminLogout } from "@/actions";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import {
   approvePayment,
   verifyRegistration,
@@ -40,6 +42,13 @@ export default async function AdminPendaftaranPage({
 }: {
   searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
+  // Proteksi: verifikasi session admin, redirect ke login jika tidak valid
+  const jar = await cookies();
+  const adminUsername = verifyAdminSession(jar.get(ADMIN_COOKIE)?.value);
+  if (!adminUsername) {
+    redirect("/admin");
+  }
+
   const sp = await searchParams;
   const page = Math.max(1, parseInt(sp.page || "1", 10) || 1);
   const q = (sp.q || "").trim();
